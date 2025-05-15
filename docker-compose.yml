@@ -3,7 +3,9 @@ version: '3.8'
 services:
   app:
     container_name: nest-app
-    build: .
+    build:
+      context: .
+      target: development  # 개발 환경에서 빌드하도록 설정
     ports:
       - '3000:3000'
     environment:
@@ -11,8 +13,9 @@ services:
     depends_on:
       - mongo
     volumes:
-      - .:/app
-      - /app/node_modules
+      - .:/app  # 코드가 변경될 때 자동으로 반영되도록 설정
+      - /app/node_modules  # node_modules를 컨테이너와 동기화
+    command: npx ts-node-dev --respawn --transpile-only src/main.ts  # 핫 리로딩을 위한 실행 명령어
 
   mongo:
     container_name: mongo
