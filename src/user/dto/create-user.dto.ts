@@ -1,6 +1,6 @@
 export class CreateUserDto {
   readonly No: number;
-  readonly level: number;
+  readonly role: number;
   readonly user_id: string;
   readonly user_password: string;
   readonly user_name?: string;

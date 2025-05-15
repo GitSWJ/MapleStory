@@ -11,7 +11,7 @@ RUN npm install
 COPY . .
 
 # Build the app for production
-RUN npm run build
+RUN npm run start:dev
 
 # Stage 2 - Production image
 FROM node:18-alpine AS production

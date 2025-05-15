@@ -1,7 +1,7 @@
 import { Schema } from 'mongoose';
 
 export const EventSchema = new Schema({
-  No: { type: Number, required: true },
+  No: { type: Number, required: true , unique: true, index: true },
   title: { type: String, required: true },
   description: { type: String, required: false },
   startDate: { type: Date, required: true },
