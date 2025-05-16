@@ -1,7 +1,6 @@
 import { Schema } from 'mongoose';
 
 export const UserSchema = new Schema({
-  No: { type: Number, required:true, unique: true, index: true },
   role: { type: Number, required: true },
   user_id: { type: String, required: true , unique: true, index: true },
   user_password: { type: String, required: true },

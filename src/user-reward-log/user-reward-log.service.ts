@@ -2,17 +2,21 @@ import { Injectable, BadRequestException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { CreateUserRewardLogDto } from './dto/create-user-reward-log.dto';
+import { UserEventStateService } from '../user-event-state/user-event-state.service';
+import { EventRuleService } from '../event-rule/event-rule.service';
 
 @Injectable()
 export class UserRewardLogService {
   constructor(
     @InjectModel('UserRewardLog') private readonly userRewardLogModel: Model<any>,
+    private readonly userEventStateService: UserEventStateService,  // UserEventStateService 주입
+    private readonly eventRuleService: EventRuleService, // EventRuleService 주입
   ) {}
 
   async claimReward(dto: CreateUserRewardLogDto) {
     const { userId, eventId, eventRuleId, rewardId } = dto;
 
-    // 중복 수령 체크 (예: 동일 이벤트 룰 보상 중복 지급 방지)
+    // 중복 수령 체크
     const alreadyClaimed = await this.userRewardLogModel.findOne({
       userId: new Types.ObjectId(userId),
       eventId: new Types.ObjectId(eventId),
@@ -23,16 +27,56 @@ export class UserRewardLogService {
       throw new BadRequestException('이미 수령한 보상입니다.');
     }
 
-    // TODO: 실제 보상 지급 로직 (ex: 게임 머니 적립, 아이템 지급 등)
-    // 지급 로직은 게임 서버나 별도 서비스와 연동 필요
+    // 유저 이벤트 상태 조회
+    const userEventState = await this.userEventStateService.findOne({
+      userId: new Types.ObjectId(userId),
+      eventId: new Types.ObjectId(eventId),
+    });
 
-    // 보상 지급 기록 저장
-    return await this.userRewardLogModel.create(dto);
+    if (!userEventState) {
+      throw new BadRequestException('이벤트 참여 상태가 없습니다.');
+    }
+
+    // 이벤트 조건 확인
+    const eventRule = await this.eventRuleService.findOne(eventId);
+    if (!eventRule) {
+      throw new BadRequestException('이벤트 규칙이 없습니다.');
+    } else if ( eventRule.conditionType === 'attendance') {
+      if (userEventState.progress < eventRule.conditionParams) {
+        throw new BadRequestException('출석 조건을 충족하지 못했습니다.');
+      }
+    } else if (eventRule.conditionType === 'invite') {
+      if (userEventState.inviteCount < eventRule.conditionParams) {
+        throw new BadRequestException('초대 조건을 충족하지 못했습니다.');
+      }
+    } else if (eventRule.conditionType === 'ranking') {
+      if (userEventState.ranking > eventRule.conditionParams) {
+        throw new BadRequestException('랭킹 조건을 충족하지 못했습니다.');
+      }
+    } else {
+      if (userEventState.progress < eventRule.conditionParams) {
+        throw new BadRequestException('조건을 충족하지 못했습니다.');
+      }
+    }
+    // 보상 지급 기록 생성
+    const createdLog = await this.userRewardLogModel.create({
+      userId: new Types.ObjectId(userId),
+      eventId: new Types.ObjectId(eventId),
+      eventRuleId: new Types.ObjectId(eventRuleId),
+      rewardId: new Types.ObjectId(rewardId),
+    });
+
+    
+    return await this.userRewardLogModel.findById(createdLog._id).populate('rewardId').exec();
   }
 
   async getUserRewards(userId: string) {
     return await this.userRewardLogModel.find({
       userId: new Types.ObjectId(userId),
     }).populate('rewardId').exec();
+  }
+
+  async getAllUserRewards() {
+    return await this.userRewardLogModel.find({}).populate('rewardId').exec();
   }
 }

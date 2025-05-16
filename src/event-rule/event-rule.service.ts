@@ -20,4 +20,8 @@ export class EventRuleService {
   async findByEvent(eventId: string) {
     return await this.eventRuleModel.find({ eventId }).exec();
   }
+  
+  async findOne(id: string) {
+    return await this.eventRuleModel.findById(id).exec();
+  }
 }

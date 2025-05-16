@@ -1,9 +1,6 @@
 import { IsMongoId } from 'class-validator';
 
-export class CreateUserRewardLogDto {
-  @IsMongoId()
-  userId: string;
-
+export class ClaimRewardDto {
   @IsMongoId()
   eventId: string;
 

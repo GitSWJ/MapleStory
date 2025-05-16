@@ -1,5 +1,10 @@
+import { IsMongoId, IsOptional, IsObject } from 'class-validator';
+
 export class CreateUserEventStateDto {
-  userId: string;
+  @IsMongoId()
   eventId: string;
+
+  @IsOptional()
+  @IsObject()
   progress?: Record<string, any>;
 }

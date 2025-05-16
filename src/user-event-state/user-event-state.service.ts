@@ -7,17 +7,18 @@ import { CreateUserEventStateDto } from './dto/create-user-event-state.dto';
 export class UserEventStateService {
   constructor(
     @InjectModel('UserEventState') private readonly userEventStateModel: Model<any>,
+    private readonly userRewardLogService: UserEventStateService, // UserEventStateService 주입
   ) {}
 
-  async upsertUserEventState(dto: CreateUserEventStateDto) {
-    const { userId, eventId, progress } = dto;
-
+  async upsertUserEventState(userId: string, dto: CreateUserEventStateDto) {
+    const { eventId, progress } = dto;
     return await this.userEventStateModel.findOneAndUpdate(
       { userId: new Types.ObjectId(userId), eventId: new Types.ObjectId(eventId) },
       { $set: { progress, lastUpdatedAt: new Date() } },
       { upsert: true, new: true },
     );
   }
+
 
   async getUserEventState(userId: string, eventId: string) {
     return await this.userEventStateModel.findOne({
@@ -30,5 +31,9 @@ export class UserEventStateService {
     return await this.userEventStateModel.find({
       userId: new Types.ObjectId(userId),
     });
+  }
+
+  async findOne(query: any) {
+    return await this.userEventStateModel.findOne(query).exec();
   }
 }

@@ -1,14 +1,19 @@
-import { Controller, Post, Get, Body, Param } from '@nestjs/common';
+import { Controller, Post, Get, Body, Param, Request } from '@nestjs/common';
 import { UserEventStateService } from './user-event-state.service';
 import { CreateUserEventStateDto } from './dto/create-user-event-state.dto';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('user-event-states')
 export class UserEventStateController {
   constructor(private readonly userEventStateService: UserEventStateService) {}
 
   @Post('upsert')
-  async upsert(@Body() dto: CreateUserEventStateDto) {
-    return this.userEventStateService.upsertUserEventState(dto);
+  async upsert(
+    @Request() req, 
+    @Body() dto: CreateUserEventStateDto
+  ) {
+    const userId = req.user.sub; // JWT에서 유저 ID 추출
+    return this.userEventStateService.upsertUserEventState(userId, dto);
   }
 
   @Get(':userId/:eventId')
