@@ -18,14 +18,15 @@ export class UserRewardLogController {
   }
 
   @Roles(0, 1) // admin, operator
+  @Get('list')
+  async getAllUserRewards() {
+    return this.userRewardLogService.getAllUserRewards();
+  }
+
+  @Roles(0, 1) // admin, operator
   @Get(':userId')
   async getUserRewards(@Param('userId') userId: string) {
     return this.userRewardLogService.getUserRewards(userId);
   }
 
-  @Roles(0, 1) // admin, operator
-  @Get('all')
-  async getAllUserRewards() {
-    return this.userRewardLogService.getAllUserRewards();
-  }
 }

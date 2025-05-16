@@ -6,8 +6,7 @@ import { CreateUserEventStateDto } from './dto/create-user-event-state.dto';
 @Injectable()
 export class UserEventStateService {
   constructor(
-    @InjectModel('UserEventState') private readonly userEventStateModel: Model<any>,
-    private readonly userRewardLogService: UserEventStateService, // UserEventStateService 주입
+    @InjectModel('UserEventState') private readonly userEventStateModel: Model<any>
   ) {}
 
   async upsertUserEventState(userId: string, dto: CreateUserEventStateDto) {

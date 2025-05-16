@@ -38,7 +38,7 @@ export class UserRewardLogService {
     }
 
     // 이벤트 조건 확인
-    const eventRule = await this.eventRuleService.findOne(eventId);
+    const eventRule = await this.eventRuleService.findOne(eventRuleId);
     if (!eventRule) {
       throw new BadRequestException('이벤트 규칙이 없습니다.');
     } else if ( eventRule.conditionType === 'attendance') {
@@ -77,6 +77,10 @@ export class UserRewardLogService {
   }
 
   async getAllUserRewards() {
-    return await this.userRewardLogModel.find({}).populate('rewardId').exec();
+    return await this.userRewardLogModel
+      .find()
+      .populate('rewardId')
+      .exec();
   }
+
 }
