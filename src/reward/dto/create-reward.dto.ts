@@ -1,5 +1,8 @@
+import { RewardType } from '../schemas/reward.schema';
+
 export class CreateRewardDto {
-  readonly No: number;
-  readonly Name: string;
-  readonly Description?: string;
+  type: RewardType;
+  value: string;
+  displayName: string;
+  description?: string;
 }

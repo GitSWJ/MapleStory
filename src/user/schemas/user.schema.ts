@@ -11,4 +11,8 @@ export const UserSchema = new Schema({
   user_address: { type: String, required: false },
   user_birth: { type: String, required: false },
   create_at: { type: Date, required: true, default: Date.now },
-});
+},
+{ 
+  timestamps: true 
+}
+);

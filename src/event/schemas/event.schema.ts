@@ -1,12 +1,22 @@
 import { Schema } from 'mongoose';
 
-export const EventSchema = new Schema({
-  No: { type: Number, required: true , unique: true, index: true },
-  title: { type: String, required: true },
-  description: { type: String, required: false },
-  startDate: { type: Date, required: true },
-  endDate: { type: Date, required: true },
-  reward: { type: Schema.Types.ObjectId, ref: 'Reward' },
-  status: { type: String, required: true, enum: ['active', 'inactive'] },
-  createdAt: { type: Date, default: Date.now }
-});
+export enum EventType {
+  ATTENDANCE = 'attendance',
+  INVITE = 'invite',
+  RANKING = 'ranking',
+  ACTION = 'action',
+}
+
+export const EventSchema = new Schema(
+  {
+    title: { type: String, required: true },
+    type: { type: String, enum: Object.values(EventType), required: true },
+    startAt: { type: Date, required: true },
+    endAt: { type: Date, required: true },
+    isActive: { type: Boolean, default: true },
+    description: { type: String },
+  },
+  {
+    timestamps: true,
+  },
+);
